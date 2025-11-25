@@ -83,7 +83,7 @@ export default function Accordion({
                 rounded-2xl md:rounded-3xl overflow-hidden
                 ${
                   variant === "card"
-                    ? "p-5 md:p-9"
+                    ? "p-5 md:p-8"
                     : "px-2 py-4 hover:bg-gray-50 md:px-4 md:py-6"
                 }
               `}
@@ -194,7 +194,7 @@ export default function Accordion({
                         animate={{ opacity: 1 }}
                         exit={{ opacity: 0 }}
                         transition={{ duration: 0.6, ease: "easeInOut" }}
-                        className="absolute inset-0"
+                        className="absolute inset-0 px-4 pb-5 pt-0 md:px-4 md:pb-9"
                       >
                         <p className="text-base leading-relaxed text-[#423F3D] md:text-lg">
                           {item.answer}

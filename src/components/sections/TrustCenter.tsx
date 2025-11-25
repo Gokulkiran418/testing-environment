@@ -110,7 +110,7 @@ export default function TrustCenter() {
         </div>
 
         {/* Right Column - Image (Desktop Only) */}
-        <div className="hidden lg:block w-full lg:flex-1 lg:max-w-[630px] relative rounded-3xl overflow-hidden bg-black">
+        <div className="hidden lg:block w-full lg:w-[630px] xl:w-[694px] aspect-[630/500] lg:aspect-[630/600] xl:aspect-[694/680] relative rounded-3xl overflow-hidden bg-black">
           <Image
             src="/trust-center/violation.png"
             alt="Trust Center Security"
@@ -122,4 +122,3 @@ export default function TrustCenter() {
     </section>
   );
 }
-

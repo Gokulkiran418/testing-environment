@@ -43,9 +43,9 @@ export default function Hero() {
         </div>
 
         {/* Demo Card Container */}
-        <div className="relative w-full max-w-[1400px] h-auto min-h-[600px] mt-12">
+        <div className="relative w-full max-w-[1400px] h-auto min-h-[100px] ">
           {/* Demo Card */}
-          <div className="relative w-full min-h-[600px] bg-white/40 backdrop-blur-[6px] border border-white rounded-3xl p-4 md:p-6 overflow-hidden">
+          <div className="relative w-full min-h-[100px] bg-white/40 backdrop-blur-[6px] border border-white rounded-3xl mt-10 overflow-hidden">
             <HeroAnimation />
           </div>
         </div>

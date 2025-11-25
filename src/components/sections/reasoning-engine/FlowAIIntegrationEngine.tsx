@@ -52,7 +52,7 @@ export default function FlowAIIntegrationEngine() {
               EMRs
             </p>
             <div className="relative w-full overflow-hidden">
-              <div className="flex gap-20 items-center animate-scroll-left">
+              <div className="flex gap-20 items-center animate-scroll-right">
                 {/* First set of logos */}
                 {emrLogos.map((logo, idx) => (
                   <div
@@ -138,7 +138,7 @@ export default function FlowAIIntegrationEngine() {
               Telephony/CCaaS Platforms
             </p>
             <div className="relative w-full overflow-hidden">
-              <div className="flex gap-20 items-center animate-scroll-left">
+              <div className="flex gap-20 items-center animate-scroll-right">
                 {/* First set of logos */}
                 {platformLogos.map((logo, idx) => (
                   <div

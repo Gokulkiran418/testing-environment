@@ -14,9 +14,12 @@ import Image from "next/image";
 
 export default function ScheduleADemo() {
   const agentOptions = [
+    "Fax/Inbox Agent",
+    "Insurance Verification Agent",
     "Scheduling Agent",
     "Patient Intake Agent",
-    "Customer Support Agent",
+    "Patient Support Agent",
+    "Analytics Agent",
   ];
 
   // Form State
@@ -177,7 +180,7 @@ export default function ScheduleADemo() {
                 {/* Heading */}
                 <div>
                   <h1 className="text-3xl md:text-4xl lg:text-4xl font-semibold mb-4">
-                    Schedule a Demo
+                    Schedule a Meeting/Demo
                   </h1>
 
                   <p className="text-sm md:text-base text-[#130f0c]/80 leading-relaxed max-w-[600px]">
@@ -198,8 +201,7 @@ export default function ScheduleADemo() {
                         See how Emily transforms the entire patient access workflow
                       </p>
                       <p className="text-sm md:text-base text-[#130f0c]/80 leading-relaxed mt-1">
-                        From scheduling and intake to benefits checks and fax processing, she
-                        automates every repetitive task.
+                        From fax to patient visits she automates every repetitive task.
                       </p>
                     </div>
                   </div>
@@ -461,8 +463,7 @@ export default function ScheduleADemo() {
                           Thank You!
                         </h2>
                         <p className="text-lg md:text-xl text-[#130f0c]/80 leading-relaxed">
-                          Thanks! We&apos;ve received your details. We&apos;re excited to show
-                          how we can help transform your workflows.
+                          Our team will be back in touch shortly.
                         </p>
                       </div>
                     </div>

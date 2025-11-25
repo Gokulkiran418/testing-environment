@@ -143,7 +143,7 @@ const tabContent: Record<TabType, TabContent> = {
     description: "",
     buttonText: "Explore your leakage map",
     whatEmilyDoes:
-      "Visualizes leakage, cycle time by step, touches per referral, agent vs. human handling, template utilization, and revenue at risk.",
+      "Real-time visualization of revenue leakage, cycle time by step, touches per referral, agent vs. human handling, template utilization, and revenue at risk.",
     guardrails: [
       "Role-based access",
       "PHI minimisation",
@@ -159,10 +159,10 @@ const tabContent: Record<TabType, TabContent> = {
 
 const tabLabels: Record<TabType, string> = {
   "fax-inbox": "Fax/Inbox AI",
-  insurance: "Insurance Verification & Eligibility AI",
+  insurance: "Insurance Verification AI",
   scheduling: "Scheduling AI",
   "patient-intake": "Patient Intake AI",
-  "patient-support": "24*7 Patient Support AI",
+  "patient-support": "Patient Support AI",
   analytics: "Analytics AI",
 };
 

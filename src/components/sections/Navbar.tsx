@@ -67,11 +67,8 @@ export default function Navbar() {
 
         {/* Desktop CTA Buttons */}
         <div className="hidden lg:flex gap-3">
-          <Button variant="Outline" size="sm" href="/schedule-a-demo">
+          <Button variant="Primary" size="sm" href="/schedule-a-demo">
             Get Started
-          </Button>
-          <Button variant="Primary" size="sm" href="https://dev.myflowai.com">
-            Log In
           </Button>
         </div>
 
@@ -143,15 +140,7 @@ export default function Navbar() {
 
           {/* Mobile CTA Buttons */}
           <div className="p-6 border-t border-gray-200 space-y-3">
-            <Button
-              variant="Primary"
-              size="sm"
-              href="https://dev.myflowai.com"
-              onClick={closeMobileMenu}
-              className="w-full"
-            >
-              Log In
-            </Button>
+
             <Button
               variant="Outline"
               size="sm"

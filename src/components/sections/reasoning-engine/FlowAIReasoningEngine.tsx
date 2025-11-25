@@ -18,11 +18,11 @@ const cardData: Record<CardType, CardContent> = {
     nestedCards: [
       {
         title: "Knowledge Base",
-        items: ["Policies", "Manuals", "FAQs", "Physician Directory"],
+        items: ["Policies & Manuals", "FAQs", "Physician Directory"],
       },
       {
         title: "Context & Memory",
-        items: ["Past Inter-actions", "Patient Preference"],
+        items: ["Patient Verification", "Patient Preference","Past Encounters"],
       },
       {
         title: "Enterprise Data",

@@ -244,7 +244,7 @@ export default function Results() {
                           }}
                           transition={{ duration: 0.3, ease: "easeInOut" }}
                         >
-                          <div className="px-6 pb-6 flex flex-col gap-4 xl:h-[504px]">
+                          <div className="px-6 pb-6 flex flex-col gap-4 xl:min-h-[415px] ">
                             {/* Mobile/Tablet Image */}
                             <div className="xl:hidden w-full h-[600px] md:h-[700px] relative rounded-2xl overflow-hidden bg-[#1f1f1f]">
                               <AnimatePresence>
