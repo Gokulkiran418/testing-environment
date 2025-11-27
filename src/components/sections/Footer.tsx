@@ -71,7 +71,7 @@ export default function Footer() {
             {/* Column 2: Resources Links */}
             <div className="flex flex-col gap-3 shrink-0">
               <Link
-                href="#"
+                href="/schedule-a-demo"
                 className="text-base leading-6 font-normal text-white opacity-70 hover:opacity-100 hover:underline hover:underline-offset-4 hover:decoration-white transition-all whitespace-pre-wrap"
               >
                 Resources

@@ -32,19 +32,27 @@ interface ReasoningCardProps {
   variant?: "mobile" | "desktop";
   /** Is this card currently expanded? (Desktop only) */
   isActive?: boolean;
+  /** Are all cards closed? (Desktop only) */
+  allClosed?: boolean;
   /** Click handler for the accordion interaction */
   onClick?: () => void;
   /** Optional class overrides (useful for width transitions) */
   className?: string;
+  /** Card type for applying specific positioning logic */
+  cardType?: CardType;
 }
 
 export default function ReasoningCard({
   data,
   variant = "desktop",
   isActive = false,
+  allClosed = false,
   onClick,
   className = "",
+  cardType,
 }: ReasoningCardProps) {
+  // Determine if this card needs special positioning (tabs 02 and 03)
+  const needsSpecialPositioning = cardType === "specialty" || cardType === "simulation";
   // Base styles shared by both layouts
   const baseStyles =
     "flex flex-col items-start justify-between p-3 rounded-3xl border border-white";
@@ -61,7 +69,7 @@ export default function ReasoningCard({
   const containerClass =
     variant === "mobile"
       ? mobileWrapperStyles
-      : `${baseStyles} ${backgroundStyle} ${className} ${isActive ? "h-[520px]" : "h-[520px]"} overflow-hidden`;
+      : `${baseStyles} ${backgroundStyle} ${className} h-[520px] relative overflow-hidden`;
 
   return (
     <div className={containerClass} onClick={onClick}>
@@ -125,7 +133,7 @@ export default function ReasoningCard({
                   duration: 0.2,
                   ease: "easeOut",
                 }}
-                className="w-full flex flex-col items-center justify-center mt-4 min-h-[279px] flex-row gap-4"
+                className="absolute top-1/2 left-0 right-0 -translate-y-1/2 w-full flex flex-row items-center justify-center gap-4 z-10"
               >
                 {/* Case A: Nested Cards Stack */}
                 {data.nestedCards && (
@@ -152,21 +160,27 @@ export default function ReasoningCard({
 
         {/* 3. Footer Section (Title/Desc for Desktop) */}
         {variant === "desktop" && (
-          <div className="flex flex-col gap-2 items-start w-full text-left mt-auto">
-            <p className={`font-semibold text-[#130F0C] w-full ${
-              isActive
-                ? "text-lg leading-[28px] whitespace-nowrap overflow-hidden text-ellipsis"
-                : "text-sm md:text-base leading-5 md:leading-6 whitespace-normal"
-            }`}>
-              {data.title}
-            </p>
-            <p className={`font-normal text-[#717171] w-full ${
-              isActive
-                ? "text-sm leading-6"
-                : "text-xs md:text-sm leading-4 md:leading-5"
-            }`}>
-              {data.description}
-            </p>
+          <div className={`absolute ${needsSpecialPositioning ? 'bottom-[10%]' : 'bottom-[10%]'} left-0 right-0 flex items-center justify-center px-2 z-20`}>
+            <div className={`flex flex-col ${allClosed ? 'gap-1 items-center' : 'gap-2 items-start text-left'} w-full ${allClosed ? 'h-[80px]' : ''}`}>
+              <p className={`font-semibold text-[#130F0C] w-full ${
+                allClosed
+                  ? "text-sm md:text-base leading-5 md:leading-6 whitespace-normal"
+                  : isActive
+                  ? "text-lg leading-[28px] whitespace-nowrap overflow-hidden text-ellipsis"
+                  : "text-sm md:text-base leading-5 md:leading-6 whitespace-normal"
+              }`}>
+                {data.title}
+              </p>
+              <p className={`font-normal text-[#717171] w-full ${
+                allClosed
+                  ? "text-xs md:text-sm leading-4 md:leading-5"
+                  : isActive
+                  ? "text-sm leading-6"
+                  : "text-xs md:text-sm leading-4 md:leading-5"
+              }`}>
+                {data.description}
+              </p>
+            </div>
           </div>
         )}
       </div>
@@ -241,8 +255,8 @@ function GraphContent({
       <div className="flex flex-col gap-4 w-full bg-white border border-[#e3e3e3] rounded-2xl p-4 sm:p-6">
         <div className="w-full flex justify-center mb-4">
           <Image
-            src="/reasoning-engine/customer-graph.svg"
-            alt="Customer Satisfaction Graph"
+            src="/reasoning-engine/accuracy.svg"
+            alt="Accuracy Graph"
             width={200}
             height={60}
             className="w-auto h-auto"
@@ -277,8 +291,8 @@ function GraphContent({
 
       <div className="h-[100px] lg:h-[125px] relative shrink-0 w-[140px] lg:w-[200px]">
         <Image
-          src="/reasoning-engine/customer-graph.svg"
-          alt="Customer Graph"
+          src="/reasoning-engine/accuracy.svg"
+          alt="Accuracy Graph"
           fill
           className="object-contain"
         />

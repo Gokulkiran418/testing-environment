@@ -14,7 +14,7 @@ const cardData: Record<CardType, CardContent> = {
     number: "01",
     title: "Contextual Reasoning Engine",
     description:
-      "Flow AI's proprietary Contextual Reasoning Engine transforms patient access management with intelligence that feels empathetic — not procedural.",
+      "Flow AI's proprietary Contextual Reasoning Engine transforms patient access management with intelligence that feels empathetic.",
     nestedCards: [
       {
         title: "Knowledge Base",
@@ -33,7 +33,7 @@ const cardData: Record<CardType, CardContent> = {
   specialty: {
     number: "02",
     title: "Specialty-Specific Workflows",
-    description: "Add Support AI and Intake AI, analytics included.",
+    description: "Pre-built, specialty-specific patient journeys delivering customized, end-to-end workflow automation for every patient care scenario.",
     nestedCards: [
       {
         title: "Cardiology",
@@ -53,17 +53,17 @@ const cardData: Record<CardType, CardContent> = {
     number: "03",
     title: "Patient Simulation Framework",
     description:
-      "All agents, multi‑site rollout, custom policies and integrations.",
+      "Healthcare-grade simulation engine that enables safe, accurate, predictable agent performance through rigorous testing.",
     metrics: [
-      { label: "Average Handle Time", value: "6m 24s" },
-      { label: "Customer CSAT", value: "4.6" },
+      { label: "RAG Accuracy", value: "6m 24s" },
+      { label: "Guardrails Adherence", value: "9.2" },
     ],
     hasGraph: true,
   },
 };
 
 export default function FlowAIReasoningEngine() {
-  const [expandedCard, setExpandedCard] = useState<CardType | null>("contextual");
+  const [expandedCard, setExpandedCard] = useState<CardType | null>(null);
 
   const handleCardClick = (cardType: CardType) => {
     // Toggle logic: if clicking active, close it (or keep open depending on UX pref)
@@ -105,6 +105,7 @@ export default function FlowAIReasoningEngine() {
             <ReasoningCard
               key={key}
               data={data}
+              cardType={key as CardType}
               variant="mobile"
             />
           ))}
@@ -121,6 +122,7 @@ export default function FlowAIReasoningEngine() {
       >
         {(Object.keys(cardData) as CardType[]).map((key) => {
           const isActive = expandedCard === key;
+          const allClosed = expandedCard === null;
           return (
             <motion.div
               key={key}
@@ -137,8 +139,10 @@ export default function FlowAIReasoningEngine() {
             >
               <ReasoningCard
                 data={cardData[key]}
+                cardType={key}
                 variant="desktop"
                 isActive={isActive}
+                allClosed={allClosed}
                 onClick={() => handleCardClick(key)}
               />
             </motion.div>

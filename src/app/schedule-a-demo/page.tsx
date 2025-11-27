@@ -73,6 +73,21 @@ export default function ScheduleADemo() {
     }
   }, [fieldErrors]);
 
+  // Helper function to check if phone number is valid (has actual digits, not just country code)
+  const isValidPhoneNumber = useCallback((phone: string): boolean => {
+    if (!phone || phone.trim() === "") return false;
+    
+    // Remove the + sign and country code to check if there are actual digits
+    // Phone numbers with only country code typically have 1-4 characters (e.g., "+1", "+44", "+123")
+    // Valid phone numbers should have more characters (country code + actual number)
+    const digitsOnly = phone.replace(/\D/g, "");
+    
+    // If there are less than 4 digits total, it's likely just a country code
+    // Most country codes are 1-3 digits, so we require at least 4 digits total
+    // (1-3 for country code + at least 1 for the actual number)
+    return digitsOnly.length >= 4;
+  }, []);
+
   const validateForm = useCallback(() => {
     const errors: Record<string, string> = {};
 
@@ -103,6 +118,11 @@ export default function ScheduleADemo() {
     setIsSubmitting(true);
 
     try {
+      // Clean phone number: only send if it has actual digits (not just country code)
+      const cleanedPhoneNumber = isValidPhoneNumber(formData.phoneNumber)
+        ? formData.phoneNumber
+        : "";
+
       const response = await fetch(
         "https://api.myflowai.com/api/v1/call-actions",
         {
@@ -115,7 +135,7 @@ export default function ScheduleADemo() {
             first_name: formData.firstName,
             last_name: formData.lastName,
             work_email: formData.workEmail,
-            phone_number: formData.phoneNumber || "",
+            phone_number: cleanedPhoneNumber,
             company: formData.company,
             title_designation: formData.jobTitle,
             how_can_we_help: formData.howCanWeHelp,
