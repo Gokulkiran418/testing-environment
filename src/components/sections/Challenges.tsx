@@ -1,8 +1,26 @@
+// Updated code with strategic preload and prefetch
+// (Full component provided as requested)
+
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
+
+// Preload + Prefetch tags for all images
+// This must be inside the component so Next.js renders tags into <head>
+
+const preloadImages = [
+  // Preload first tab image only (highest priority)
+  { href: "/challenges/broken.webp", rel: "preload" },
+];
+
+const prefetchImages = [
+  // Remaining images as prefetch (idle priority)
+  "/challenges/challenges.webp",
+  "/challenges/legacy.webp",
+  "/challenges/profitability.webp",
+];
 
 type TabType = "broken" | "operations" | "legacy" | "profitability";
 
@@ -19,7 +37,7 @@ interface TabContent {
 
 const tabContent: Record<TabType, TabContent> = {
   broken: {
-    image: "/challenges/broken.png",
+    image: "/challenges/broken.webp",
     cards: [
       { number: "01", title: "Long Holds on Calls Navigating Your IVR, Waiting to Speak to Your Busy Agents", opacity: 0.4 },
       { number: "02", title: "Your Scheduling / Patient Support Teams Can Only Be Reached During Office Hours", opacity: 0.8 },
@@ -29,7 +47,7 @@ const tabContent: Record<TabType, TabContent> = {
   },
 
   operations: {
-    image: "/challenges/challenges.png",
+    image: "/challenges/challenges.webp",
     cards: [
       { number: "01", title: "Scheduling & clinic front desk teams faced with staff shortages & high turnover", opacity: 0.4 },
       { number: "02", title: "Low referral to appointment conversion", opacity: 0.8 },
@@ -39,7 +57,7 @@ const tabContent: Record<TabType, TabContent> = {
   },
 
   legacy: {
-    image: "/challenges/legacy.png",
+    image: "/challenges/legacy.webp",
     cards: [
       { number: "01", title: "Your IT teams have to maintain legacy non-automated systems without failures", opacity: 0.4 },
       { number: "02", title: "High manual effort across fax/inbox, referral triage, scheduling & patient intake", opacity: 0.8 },
@@ -49,7 +67,7 @@ const tabContent: Record<TabType, TabContent> = {
   },
 
   profitability: {
-    image: "/challenges/profitability.png",
+    image: "/challenges/profitability.webp",
     cards: [
       { number: "01", title: "Rising cost to serve with growing labor costs as a % of revenues", opacity: 0.4 },
       { number: "02", title: "Payer price pressure", opacity: 0.8 },
@@ -59,15 +77,13 @@ const tabContent: Record<TabType, TabContent> = {
   },
 };
 
-// Placeholder text for maintaining consistent card height (longest text from each card position)
 const placeholderTexts = [
-  "Scheduling & clinic front desk teams faced with staff shortages & high turnover", // Longest for card 01
-  "Your Scheduling / Patient Support Teams Can Only Be Reached During Office Hours", // Longest for card 02
-  "Challenges in getting compliance with new processes or workflows you put in place", // Longest for card 03
-  "Unclear rules engine makes onboarding of new staff and training challenging", // Longest for card 04
+  "Scheduling & clinic front desk teams faced with staff shortages & high turnover",
+  "Your Scheduling / Patient Support Teams Can Only Be Reached During Office Hours",
+  "Challenges in getting compliance with new processes or workflows you put in place",
+  "Unclear rules engine makes onboarding of new staff and training challenging",
 ];
 
-// Custom scrollbar classes
 const scrollbarStyles = `
 ::-webkit-scrollbar {
   height: 6px;
@@ -92,20 +108,21 @@ export default function Challenges() {
     { id: "profitability" as TabType, label: "Pressures on Profitability" },
   ];
 
-  // Preload remaining tab images on mount (first two are already prioritized)
-  useEffect(() => {
-    const imagesToPreload = ["/challenges/legacy.png", "/challenges/profitability.png"];
-    imagesToPreload.forEach(src => {
-      const img = new window.Image();
-      img.src = src;
-    });
-  }, []);
-
   const currentContent = tabContent[activeTab];
 
   return (
-    <section className="relative w-full flex flex-col items-center justify-center px-5  md:px-14 bg-white">
+    <section className="relative w-full flex flex-col items-center justify-center px-5 md:px-14 bg-white">
       <style>{scrollbarStyles}</style>
+
+      {/* --- PRELOAD + PREFETCH TAGS RENDERED INTO <head> --- */}
+      <>
+        {preloadImages.map((img) => (
+          <link key={img.href} rel="preload" as="image" href={img.href} />
+        ))}
+        {prefetchImages.map((href) => (
+          <link key={href} rel="prefetch" as="image" href={href} />
+        ))}
+      </>
 
       <div className="relative z-10 w-full max-w-[1280px] flex flex-col gap-10 md:gap-12 items-center">
 
@@ -133,17 +150,16 @@ export default function Challenges() {
                 <motion.button
                   key={tab.id}
                   onClick={() => setActiveTab(tab.id)}
-                  animate={{
-                    opacity: activeTab === tab.id ? 1 : 0.7,
-                  }}
+                  animate={{ opacity: activeTab === tab.id ? 1 : 0.7 }}
                   transition={{ duration: 0.3, ease: "easeInOut" }}
                   className="px-4 py-3 md:px-5 md:py-4 rounded-xl whitespace-nowrap border border-transparent hover:bg-white/50"
-                  style={{
-                    backgroundColor: activeTab === tab.id ? "#ffffff" : "transparent"
-                  }}
+                  style={{ backgroundColor: activeTab === tab.id ? "#ffffff" : "transparent" }}
                 >
-                  <p className={`font-medium text-base md:text-lg
-                      ${activeTab === tab.id ? "text-[#130f0c]" : "text-[rgba(19,15,12,0.7)]"}`}>
+                  <p
+                    className={`font-medium text-base md:text-lg ${
+                      activeTab === tab.id ? "text-[#130f0c]" : "text-[rgba(19,15,12,0.7)]"
+                    }`}
+                  >
                     {tab.label}
                   </p>
                 </motion.button>
@@ -157,14 +173,13 @@ export default function Challenges() {
             style={{
               backgroundColor: "#F5F5F5",
               backgroundImage:
-                "linear-gradient(154.93deg, #F5F5F5 31.11%,rgb(255, 252, 240) 46.73%, #FFCC92 60.92%, #FFAB82 73.08%, rgba(255, 196, 167, 0.508) 89.82%, rgba(255, 255, 255, 0) 107.11%)",
+                "linear-gradient(154.93deg, #F5F5F5 31.11%, rgb(255, 252, 240) 46.73%, #FFCC92 60.92%, #FFAB82 73.08%, rgba(255, 196, 167, 0.508) 89.82%, rgba(255, 255, 255, 0) 107.11%)",
             }}
           >
             <div className="flex flex-col lg:flex-row gap-6">
 
               {/* LEFT IMAGE */}
               <div className="w-full rounded-3xl bg-white/80 overflow-hidden aspect-[1/1] md:aspect-[1/1] lg:aspect-auto lg:flex-1 lg:min-h-[600px] relative">
-                {/* Animated overlay */}
                 <AnimatePresence>
                   <motion.div
                     key={`image-${activeTab}`}
@@ -193,6 +208,7 @@ export default function Challenges() {
                     key={index}
                     className="bg-white rounded-3xl p-6 flex flex-col justify-between border border-white h-auto lg:h-[321px]"
                     style={{ backgroundColor: `rgba(255,255,255,${card.opacity})` }}
+
                   >
                     <p className="text-base text-[#423f3d]">{card.number}</p>
                     <div className="relative flex-1 flex flex-col">

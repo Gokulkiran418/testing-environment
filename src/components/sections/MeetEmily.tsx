@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useCallback, useMemo, useEffect } from "react";
+import React, { useState, useCallback, useMemo } from "react";
 import Image from "next/image";
 import Button from "@/components/ui/Button";
 import { motion, AnimatePresence } from "framer-motion";
@@ -79,7 +79,7 @@ const tabContent: Record<TabType, TabContent> = {
       "Referral cycle time down",
       "Completion rate up",
     ],
-    image: "/meetemily/insurance.png",
+    image: "/meetemily/insurance.webp",
   },
   scheduling: {
     title: "Fill the right slot the first time",
@@ -98,7 +98,7 @@ const tabContent: Record<TabType, TabContent> = {
       "Schedule Utilization up",
       "Referral to Appointment Conversion Up",
     ],
-    image: "/meetemily/scheduling.png",
+    image: "/meetemily/scheduling.webp",
   },
   "patient-intake": {
     title: "Cut Down Patient Wait Time at the Clinic",
@@ -117,7 +117,7 @@ const tabContent: Record<TabType, TabContent> = {
       "Fewer day‑of surprises",
       "Lower no-shows",
     ],
-    image: "/meetemily/patient-intake.png",
+    image: "/meetemily/patient-intake.webp",
   },
   "patient-support": {
     title: "Answers without the wait",
@@ -136,7 +136,7 @@ const tabContent: Record<TabType, TabContent> = {
       "Patient Satisfaction Up",
       "Your staff time freed up for Patient Care",
     ],
-    image: "/meetemily/patient-support.png",
+    image: "/meetemily/patient-support.webp",
   },
   analytics: {
     title: "See and fix your referral to visit funnel",
@@ -153,9 +153,25 @@ const tabContent: Record<TabType, TabContent> = {
     enables: [
       "Enables your weekly KPI reviews to drive targeted improvements in your operations.",
     ],
-    image: "/meetemily/analytics.png",
+    image: "/meetemily/analytics.webp",
   },
 };
+
+// Preload + Prefetch tags for all images
+// This must be inside the component so Next.js renders tags into <head>
+const preloadImages = [
+  // Preload first tab image only (highest priority)
+  { href: "/meetemily/fax-inbox.svg", rel: "preload" },
+];
+
+const prefetchImages = [
+  // Remaining images as prefetch (idle priority)
+  "/meetemily/insurance.webp",
+  "/meetemily/scheduling.webp",
+  "/meetemily/patient-intake.webp",
+  "/meetemily/patient-support.webp",
+  "/meetemily/analytics.webp",
+];
 
 const tabLabels: Record<TabType, string> = {
   "fax-inbox": "Fax/Inbox AI",
@@ -199,15 +215,6 @@ export default function MeetEmily() {
   const content = tabContent[activeTab];
   const activeTabIndex = getTabIndex(activeTab);
   const slideDirection = getSlideDirection(activeTabIndex);
-
-  // Preload all tab images on mount
-  useEffect(() => {
-    const imagesToPreload = Object.values(tabContent).map(content => content.image);
-    imagesToPreload.forEach(src => {
-      const img = new window.Image();
-      img.src = src;
-    });
-  }, []);
 
   const renderTabButton = useCallback((tabKey: TabType, layout: "horizontal" | "vertical") => {
     const isActive = activeTab === tabKey;
@@ -261,6 +268,17 @@ export default function MeetEmily() {
       }}
     >
       <style>{scrollbarStyles}</style>
+
+      {/* --- PRELOAD + PREFETCH TAGS RENDERED INTO <head> --- */}
+      <>
+        {preloadImages.map((img) => (
+          <link key={img.href} rel="preload" as="image" href={img.href} />
+        ))}
+        {prefetchImages.map((href) => (
+          <link key={href} rel="prefetch" as="image" href={href} />
+        ))}
+      </>
+
   {/* Background Gradient Ellipses */}
   <div className="absolute inset-0 overflow-hidden pointer-events-none">
     <div className="absolute left-[calc(50%+4px)] w-[2048px] h-[2048px] top-[231px] -translate-x-1/2">

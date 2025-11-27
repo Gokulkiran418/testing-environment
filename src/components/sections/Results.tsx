@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
 import Button from "@/components/ui/Button";
@@ -39,7 +39,7 @@ const tabContent: Record<TabType, TabContent> = {
       "Audit-ready trails",
     ],
     ctaText: "Identify your top three leakage points",
-    backgroundImage: "/outcomes/reduce-leakage.png",
+    backgroundImage: "/outcomes/reduce-leakage.webp",
     graphImage: "/outcomes/graphs/payer-denials.svg",
     graphTitle: "Payer Denials",
     graphSubtitle: "Jan 31 - Sep 30",
@@ -59,7 +59,7 @@ const tabContent: Record<TabType, TabContent> = {
       "24/7 self‑service",
     ],
     ctaText: "Model your time‑to‑appointment gains",
-    backgroundImage: "/outcomes/shorten-time.png",
+    backgroundImage: "/outcomes/shorten-time.webp",
     graphImage: "/outcomes/graphs/referral-appointment.svg",
     graphTitle: "Time from Referral to Appointment",
     graphSubtitle: "Jan 31 - Sep 30",
@@ -78,7 +78,7 @@ const tabContent: Record<TabType, TabContent> = {
       "Support deflection",
     ],
     ctaText: "Estimate FTE hours reclaimed",
-    backgroundImage: "/outcomes/staff-capacity.png",
+    backgroundImage: "/outcomes/staff-capacity.webp",
     graphImage: "/outcomes/graphs/emily-appointment.svg",
     graphTitle: "% Appointments Scheduled\nby Emily",
     graphSubtitle: "Jan 31 - Sep 30",
@@ -98,7 +98,7 @@ const tabContent: Record<TabType, TabContent> = {
       "Offloading work to Emily",
     ],
     ctaText: "Estimate your ROI",
-    backgroundImage: "/outcomes/lower-cost.png",
+    backgroundImage: "/outcomes/lower-cost.webp",
     graphImage: "/outcomes/graphs/labor-cost.svg",
     graphTitle: "Labor Cost as a % of Revenues",
     graphSubtitle: "Jan 31 - Sep 30",
@@ -109,6 +109,14 @@ const tabContent: Record<TabType, TabContent> = {
     ],
   },
 };
+
+// Preload tags for all background images (high priority)
+const preloadImages = [
+  { href: "/outcomes/reduce-leakage.webp", rel: "preload" },
+  { href: "/outcomes/shorten-time.webp", rel: "preload" },
+  { href: "/outcomes/staff-capacity.webp", rel: "preload" },
+  { href: "/outcomes/lower-cost.webp", rel: "preload" },
+];
 
 const tabs: { id: TabType; label: string }[] = [
   { id: "reduce-leakage", label: "Reduce Leakage, Lower Denials" },
@@ -121,15 +129,6 @@ export default function Results() {
   const [activeTab, setActiveTab] = useState<TabType>("reduce-leakage");
   const [previousTab, setPreviousTab] = useState<TabType>("reduce-leakage");
   const content = tabContent[activeTab];
-
-  // Preload all tab background images on mount
-  useEffect(() => {
-    const imagesToPreload = Object.values(tabContent).map(content => content.backgroundImage);
-    imagesToPreload.forEach(src => {
-      const img = new window.Image();
-      img.src = src;
-    });
-  }, []);
 
   // Handle tab change with direction tracking
   const handleTabChange = (newTab: TabType) => {
@@ -152,6 +151,13 @@ export default function Results() {
           "linear-gradient(185.57deg, #FFFFFF -10.98%, #FEF5D6 16.67%, #FFCC92 41.79%, #FFAB82 63.31%, rgba(255, 196, 167, 0.508135) 92.94%, rgba(255, 255, 255, 0) 123.54%), #ECECEC",
       }}
     >
+      {/* --- PRELOAD TAGS RENDERED INTO <head> --- */}
+      <>
+        {preloadImages.map((img) => (
+          <link key={img.href} rel="preload" as="image" href={img.href} />
+        ))}
+      </>
+
       {/* Dark Background Image Overlay */}
       <div
         className="absolute inset-0 w-full h-full"

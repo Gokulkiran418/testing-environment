@@ -280,7 +280,7 @@ function GraphContent({
   // Desktop View
   return (
     <div className="bg-white flex flex-row justify-center items-center gap-2 lg:gap-4 w-full h-full">
-      <div className="bg-white border border-[#e3e3e3] flex flex-col gap-1 items-start px-3 py-4 lg:px-4 lg:py-5 rounded-xl flex-1 min-w-0">
+      <div className="bg-white border border-[#e3e3e3] flex flex-col gap-1 items-start px-3 py-4  lg:px-10 lg:py-5 rounded-xl w-fit">
         <p className="font-normal text-xs lg:text-sm text-black/60 break-words">
           {data.metrics?.[0].label}
         </p>
@@ -298,7 +298,7 @@ function GraphContent({
         />
       </div>
 
-      <div className="bg-white border border-[#e3e3e3] flex flex-col gap-1 items-start px-3 py-4 lg:px-4 lg:py-5 rounded-xl flex-1 min-w-0">
+      <div className="bg-white border border-[#e3e3e3] flex flex-col gap-1 items-start px-3 py-4 lg:px-4 lg:py-5 rounded-xl w-fit">
         <p className="font-normal text-xs lg:text-sm text-black/60 break-words">
           {data.metrics?.[1].label}
         </p>

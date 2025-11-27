@@ -63,7 +63,7 @@ const cardData: Record<CardType, CardContent> = {
 };
 
 export default function FlowAIReasoningEngine() {
-  const [expandedCard, setExpandedCard] = useState<CardType | null>(null);
+  const [expandedCard, setExpandedCard] = useState<CardType | null>("contextual");
 
   const handleCardClick = (cardType: CardType) => {
     // Toggle logic: if clicking active, close it (or keep open depending on UX pref)
