@@ -1,26 +1,8 @@
-// Updated code with strategic preload and prefetch
-// (Full component provided as requested)
-
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
-
-// Preload + Prefetch tags for all images
-// This must be inside the component so Next.js renders tags into <head>
-
-const preloadImages = [
-  // Preload first tab image only (highest priority)
-  { href: "/challenges/broken.webp", rel: "preload" },
-];
-
-const prefetchImages = [
-  // Remaining images as prefetch (idle priority)
-  "/challenges/challenges.webp",
-  "/challenges/legacy.webp",
-  "/challenges/profitability.webp",
-];
 
 type TabType = "broken" | "operations" | "legacy" | "profitability";
 
@@ -100,6 +82,30 @@ const scrollbarStyles = `
 
 export default function Challenges() {
   const [activeTab, setActiveTab] = useState<TabType>("broken");
+  const [isVisible, setIsVisible] = useState(false);
+  const sectionRef = useRef<HTMLElement>(null);
+
+  // IntersectionObserver to preload images when section enters viewport
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting) {
+          setIsVisible(true);
+          observer.disconnect(); // Only fire once
+        }
+      },
+      {
+        threshold: 0.1,
+        rootMargin: "300px", // Start loading 300px before entering viewport
+      }
+    );
+
+    if (sectionRef.current) {
+      observer.observe(sectionRef.current);
+    }
+
+    return () => observer.disconnect();
+  }, []);
 
   const tabs = [
     { id: "broken" as TabType, label: "Broken Patient Experience" },
@@ -111,18 +117,35 @@ export default function Challenges() {
   const currentContent = tabContent[activeTab];
 
   return (
-    <section className="relative w-full flex flex-col items-center justify-center px-5 md:px-14 bg-white">
+    <section
+      ref={sectionRef}
+      className="relative w-full flex flex-col items-center justify-center px-5 md:px-14 bg-white"
+    >
       <style>{scrollbarStyles}</style>
 
-      {/* --- PRELOAD + PREFETCH TAGS RENDERED INTO <head> --- */}
-      <>
-        {preloadImages.map((img) => (
-          <link key={img.href} rel="preload" as="image" href={img.href} />
-        ))}
-        {prefetchImages.map((href) => (
-          <link key={href} rel="prefetch" as="image" href={href} />
-        ))}
-      </>
+      {/* Hidden preload images - warm cache when section is visible */}
+      {isVisible && (
+        <div
+          className="absolute w-0 h-0 overflow-hidden pointer-events-none"
+          aria-hidden="true"
+        >
+          {Object.values(tabContent).map((content) => (
+            <div
+              key={content.image}
+              className="relative w-[800px] h-[600px]"
+            >
+              <Image
+                src={content.image}
+                alt=""
+                fill
+                sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 40vw"
+                loading="eager"
+                priority={false}
+              />
+            </div>
+          ))}
+        </div>
+      )}
 
       <div className="relative z-10 w-full max-w-[1280px] flex flex-col gap-10 md:gap-12 items-center">
 
@@ -195,7 +218,6 @@ export default function Challenges() {
                       fill
                       sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 40vw"
                       className={`object-cover ${activeTab === "legacy" ? "object-left" : "object-center"}`}
-                      priority={activeTab === "broken"}
                     />
                   </motion.div>
                 </AnimatePresence>
