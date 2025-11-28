@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
 import Button from "@/components/ui/Button";
@@ -110,14 +110,6 @@ const tabContent: Record<TabType, TabContent> = {
   },
 };
 
-// Preload tags for all background images (high priority)
-const preloadImages = [
-  { href: "/outcomes/reduce-leakage.webp", rel: "preload" },
-  { href: "/outcomes/shorten-time.webp", rel: "preload" },
-  { href: "/outcomes/staff-capacity.webp", rel: "preload" },
-  { href: "/outcomes/lower-cost.webp", rel: "preload" },
-];
-
 const tabs: { id: TabType; label: string }[] = [
   { id: "reduce-leakage", label: "Reduce Leakage, Lower Denials" },
   { id: "shorten-time", label: "Shorten Time‑to‑Appointment" },
@@ -128,7 +120,31 @@ const tabs: { id: TabType; label: string }[] = [
 export default function Results() {
   const [activeTab, setActiveTab] = useState<TabType>("reduce-leakage");
   const [previousTab, setPreviousTab] = useState<TabType>("reduce-leakage");
+  const [isVisible, setIsVisible] = useState(false);
+  const sectionRef = useRef<HTMLElement>(null);
   const content = tabContent[activeTab];
+
+  // IntersectionObserver to preload images when section enters viewport
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting) {
+          setIsVisible(true);
+          observer.disconnect(); // Only fire once
+        }
+      },
+      {
+        threshold: 0.1,
+        rootMargin: "300px", // Start loading 300px before entering viewport
+      }
+    );
+
+    if (sectionRef.current) {
+      observer.observe(sectionRef.current);
+    }
+
+    return () => observer.disconnect();
+  }, []);
 
   // Handle tab change with direction tracking
   const handleTabChange = (newTab: TabType) => {
@@ -144,6 +160,7 @@ export default function Results() {
 
   return (
     <section
+      ref={sectionRef}
       id="outcomes"
       className="relative w-full flex flex-col items-center justify-center px-5 md:px-20 py-12 md:py-16 overflow-hidden"
       style={{
@@ -151,12 +168,40 @@ export default function Results() {
           "linear-gradient(185.57deg, #FFFFFF -10.98%, #FEF5D6 16.67%, #FFCC92 41.79%, #FFAB82 63.31%, rgba(255, 196, 167, 0.508135) 92.94%, rgba(255, 255, 255, 0) 123.54%), #ECECEC",
       }}
     >
-      {/* --- PRELOAD TAGS RENDERED INTO <head> --- */}
-      <>
-        {preloadImages.map((img) => (
-          <link key={img.href} rel="preload" as="image" href={img.href} />
-        ))}
-      </>
+      {/* Hidden preload images - warm cache when section is visible */}
+      {isVisible && (
+        <div
+          className="absolute w-0 h-0 overflow-hidden pointer-events-none"
+          aria-hidden="true"
+        >
+          {Object.values(tabContent).map((tab) => (
+            <React.Fragment key={`${tab.backgroundImage}-${tab.graphImage}`}>
+              {/* Background image */}
+              <div className="relative w-[800px] h-[600px]">
+                <Image
+                  src={tab.backgroundImage}
+                  alt=""
+                  fill
+                  sizes="(max-width: 1024px) 100vw, 50vw"
+                  loading="eager"
+                  priority={false}
+                />
+              </div>
+              {/* Graph image */}
+              <div className="relative w-[400px] h-[220px]">
+                <Image
+                  src={tab.graphImage}
+                  alt=""
+                  fill
+                  sizes="400px"
+                  loading="eager"
+                  priority={false}
+                />
+              </div>
+            </React.Fragment>
+          ))}
+        </div>
+      )}
 
       {/* Dark Background Image Overlay */}
       <div
@@ -248,7 +293,7 @@ export default function Results() {
                             open: { height: "auto", opacity: 1 },
                             collapsed: { height: 0, opacity: 0 }
                           }}
-                          transition={{ duration: 0.3, ease: "easeInOut" }}
+                          transition={{ duration: 0.6, ease: "easeInOut" }}
                         >
                           <div className="px-6 pb-6 flex flex-col gap-4 xl:min-h-[415px] ">
                             {/* Mobile/Tablet Image */}
@@ -259,7 +304,7 @@ export default function Results() {
                                   initial={{ opacity: 0 }}
                                   animate={{ opacity: 1 }}
                                   exit={{ opacity: 0 }}
-                                  transition={{ duration: 0.4, ease: "easeInOut" }}
+                                  transition={{ duration: 0.6, ease: "easeInOut" }}
                                   className="absolute inset-0 w-full h-full md:origin-top"
                                 >
                                   <Image
@@ -484,7 +529,7 @@ export default function Results() {
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   exit={{ opacity: 0 }}
-                  transition={{ duration: 0.4, ease: "easeInOut" }}
+                  transition={{ duration: 1, ease: "easeInOut" }}
                   className="absolute inset-0 w-full h-full"
                 >
                   <Image
@@ -492,7 +537,6 @@ export default function Results() {
                     alt={content.title}
                     fill
                     className="object-cover object-center"
-                    priority={activeTab === "reduce-leakage"}
                   />
                 </motion.div>
               </AnimatePresence>

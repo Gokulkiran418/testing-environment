@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useCallback, useMemo } from "react";
+import React, { useState, useCallback, useMemo, useRef, useEffect } from "react";
 import Image from "next/image";
 import Button from "@/components/ui/Button";
 import { motion, AnimatePresence } from "framer-motion";
@@ -157,22 +157,6 @@ const tabContent: Record<TabType, TabContent> = {
   },
 };
 
-// Preload + Prefetch tags for all images
-// This must be inside the component so Next.js renders tags into <head>
-const preloadImages = [
-  // Preload first tab image only (highest priority)
-  { href: "/meetemily/fax-inbox.svg", rel: "preload" },
-];
-
-const prefetchImages = [
-  // Remaining images as prefetch (idle priority)
-  "/meetemily/insurance.webp",
-  "/meetemily/scheduling.webp",
-  "/meetemily/patient-intake.webp",
-  "/meetemily/patient-support.webp",
-  "/meetemily/analytics.webp",
-];
-
 const tabLabels: Record<TabType, string> = {
   "fax-inbox": "Fax/Inbox AI",
   insurance: "Insurance Verification AI",
@@ -212,9 +196,33 @@ const ArrowIcon = () => (
 
 export default function MeetEmily() {
   const [activeTab, setActiveTab] = useState<TabType>("fax-inbox");
+  const [isVisible, setIsVisible] = useState(false);
+  const sectionRef = useRef<HTMLElement>(null);
   const content = tabContent[activeTab];
   const activeTabIndex = getTabIndex(activeTab);
   const slideDirection = getSlideDirection(activeTabIndex);
+
+  // IntersectionObserver to preload images when section enters viewport
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting) {
+          setIsVisible(true);
+          observer.disconnect(); // Only fire once
+        }
+      },
+      {
+        threshold: 0.1,
+        rootMargin: "300px", // Start loading 300px before entering viewport
+      }
+    );
+
+    if (sectionRef.current) {
+      observer.observe(sectionRef.current);
+    }
+
+    return () => observer.disconnect();
+  }, []);
 
   const renderTabButton = useCallback((tabKey: TabType, layout: "horizontal" | "vertical") => {
     const isActive = activeTab === tabKey;
@@ -260,6 +268,7 @@ export default function MeetEmily() {
 
   return (
     <section
+      ref={sectionRef}
       id="product"
       className="relative w-full min-h-screen md:min-h-[1100px] lg:min-h-[1200px] xl:min-h-[1273px] flex flex-col items-center overflow-hidden px-4 md:px-12 lg:px-16 xl:px-20 "
       style={{
@@ -269,15 +278,29 @@ export default function MeetEmily() {
     >
       <style>{scrollbarStyles}</style>
 
-      {/* --- PRELOAD + PREFETCH TAGS RENDERED INTO <head> --- */}
-      <>
-        {preloadImages.map((img) => (
-          <link key={img.href} rel="preload" as="image" href={img.href} />
-        ))}
-        {prefetchImages.map((href) => (
-          <link key={href} rel="prefetch" as="image" href={href} />
-        ))}
-      </>
+      {/* Hidden preload images - warm cache when section is visible */}
+      {isVisible && (
+        <div
+          className="absolute w-0 h-0 overflow-hidden pointer-events-none"
+          aria-hidden="true"
+        >
+          {Object.values(tabContent).map((content) => (
+            <div
+              key={content.image}
+              className="relative w-[800px] h-[600px]"
+            >
+              <Image
+                src={content.image}
+                alt=""
+                fill
+                sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 40vw"
+                loading="eager"
+                priority={false}
+              />
+            </div>
+          ))}
+        </div>
+      )}
 
   {/* Background Gradient Ellipses */}
   <div className="absolute inset-0 overflow-hidden pointer-events-none">
@@ -528,7 +551,7 @@ export default function MeetEmily() {
                           initial={{ opacity: 0 }}
                           animate={{ opacity: 1 }}
                           exit={{ opacity: 0 }}
-                          transition={{ duration: 0.4, ease: "easeInOut" }}
+                          transition={{ duration: 1, ease: "easeInOut" }}
                           className="absolute inset-0"
                         >
                           <Image
@@ -536,7 +559,6 @@ export default function MeetEmily() {
                             alt={content.title}
                             fill
                             className="object-contain p-3 md:p-4"
-                            loading="lazy"
                             sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 40vw"
                           />
                         </motion.div>
