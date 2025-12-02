@@ -1,7 +1,6 @@
 "use client";
 
-import React, { useState, useRef, useEffect } from "react";
-import Image from "next/image";
+import React, { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 
 type TabType = "broken" | "operations" | "legacy" | "profitability";
@@ -14,12 +13,14 @@ interface ProblemCard {
 
 interface TabContent {
   image: string;
+  video: string;
   cards: ProblemCard[];
 }
 
 const tabContent: Record<TabType, TabContent> = {
   broken: {
-    image: "/challenges/broken.webp",
+    image: "https://d2h9x7vafti7jh.cloudfront.net/challenges/broken.webp",
+    video: "https://d2h9x7vafti7jh.cloudfront.net/challenges/Broken.mp4",
     cards: [
       { number: "01", title: "Long Holds on Calls Navigating Your IVR, Waiting to Speak to Your Busy Agents", opacity: 0.4 },
       { number: "02", title: "Your Scheduling / Patient Support Teams Can Only Be Reached During Office Hours", opacity: 0.8 },
@@ -29,7 +30,8 @@ const tabContent: Record<TabType, TabContent> = {
   },
 
   operations: {
-    image: "/challenges/challenges.webp",
+    image: "https://d2h9x7vafti7jh.cloudfront.net/challenges/challenges.webp",
+    video: "https://d2h9x7vafti7jh.cloudfront.net/challenges/Challenges.mp4",
     cards: [
       { number: "01", title: "Scheduling & clinic front desk teams faced with staff shortages & high turnover", opacity: 0.4 },
       { number: "02", title: "Low referral to appointment conversion", opacity: 0.8 },
@@ -39,7 +41,8 @@ const tabContent: Record<TabType, TabContent> = {
   },
 
   legacy: {
-    image: "/challenges/legacy.webp",
+    image: "https://d2h9x7vafti7jh.cloudfront.net/challenges/legacy.webp",
+    video: "https://d2h9x7vafti7jh.cloudfront.net/challenges/Legacy.mp4",
     cards: [
       { number: "01", title: "Your IT teams have to maintain legacy non-automated systems without failures", opacity: 0.4 },
       { number: "02", title: "High manual effort across fax/inbox, referral triage, scheduling & patient intake", opacity: 0.8 },
@@ -49,7 +52,8 @@ const tabContent: Record<TabType, TabContent> = {
   },
 
   profitability: {
-    image: "/challenges/profitability.webp",
+    image: "https://d2h9x7vafti7jh.cloudfront.net/challenges/profitability.webp",
+    video: "https://d2h9x7vafti7jh.cloudfront.net/challenges/Profitability.mp4",
     cards: [
       { number: "01", title: "Rising cost to serve with growing labor costs as a % of revenues", opacity: 0.4 },
       { number: "02", title: "Payer price pressure", opacity: 0.8 },
@@ -82,30 +86,6 @@ const scrollbarStyles = `
 
 export default function Challenges() {
   const [activeTab, setActiveTab] = useState<TabType>("broken");
-  const [isVisible, setIsVisible] = useState(false);
-  const sectionRef = useRef<HTMLElement>(null);
-
-  // IntersectionObserver to preload images when section enters viewport
-  useEffect(() => {
-    const observer = new IntersectionObserver(
-      (entries) => {
-        if (entries[0].isIntersecting) {
-          setIsVisible(true);
-          observer.disconnect(); // Only fire once
-        }
-      },
-      {
-        threshold: 0.1,
-        rootMargin: "300px", // Start loading 300px before entering viewport
-      }
-    );
-
-    if (sectionRef.current) {
-      observer.observe(sectionRef.current);
-    }
-
-    return () => observer.disconnect();
-  }, []);
 
   const tabs = [
     { id: "broken" as TabType, label: "Broken Patient Experience" },
@@ -117,35 +97,8 @@ export default function Challenges() {
   const currentContent = tabContent[activeTab];
 
   return (
-    <section
-      ref={sectionRef}
-      className="relative w-full flex flex-col items-center justify-center px-5 md:px-14 bg-white"
-    >
+    <section className="relative w-full flex flex-col items-center justify-center px-5 md:px-14 bg-white">
       <style>{scrollbarStyles}</style>
-
-      {/* Hidden preload images - warm cache when section is visible */}
-      {isVisible && (
-        <div
-          className="absolute w-0 h-0 overflow-hidden pointer-events-none"
-          aria-hidden="true"
-        >
-          {Object.values(tabContent).map((content) => (
-            <div
-              key={content.image}
-              className="relative w-[800px] h-[600px]"
-            >
-              <Image
-                src={content.image}
-                alt=""
-                fill
-                sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 40vw"
-                loading="eager"
-                priority={false}
-              />
-            </div>
-          ))}
-        </div>
-      )}
 
       <div className="relative z-10 w-full max-w-[1280px] flex flex-col gap-10 md:gap-12 items-center">
 
@@ -179,9 +132,8 @@ export default function Challenges() {
                   style={{ backgroundColor: activeTab === tab.id ? "#ffffff" : "transparent" }}
                 >
                   <p
-                    className={`font-medium text-base md:text-lg ${
-                      activeTab === tab.id ? "text-[#130f0c]" : "text-[rgba(19,15,12,0.7)]"
-                    }`}
+                    className={`font-medium text-base md:text-lg ${activeTab === tab.id ? "text-[#130f0c]" : "text-[rgba(19,15,12,0.7)]"
+                      }`}
                   >
                     {tab.label}
                   </p>
@@ -205,19 +157,21 @@ export default function Challenges() {
               <div className="w-full rounded-3xl bg-white/80 overflow-hidden aspect-[1/1] md:aspect-[1/1] lg:aspect-auto lg:flex-1 lg:min-h-[600px] relative">
                 <AnimatePresence>
                   <motion.div
-                    key={`image-${activeTab}`}
+                    key={`video-${activeTab}`}
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                     exit={{ opacity: 0 }}
-                    transition={{ duration: 1, ease: "easeInOut" }}
+                    transition={{ duration: 0.5, ease: "easeInOut" }}
                     className="absolute inset-0"
                   >
-                    <Image
-                      src={currentContent.image}
-                      alt={activeTab}
-                      fill
-                      sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 40vw"
-                      className={`object-cover ${activeTab === "legacy" ? "object-left" : "object-center"}`}
+                    <video
+                      src={currentContent.video}
+                      poster={currentContent.image}
+                      autoPlay
+                      muted
+                      loop
+                      playsInline
+                      className={`w-full h-full object-cover ${activeTab === "legacy" ? "object-left" : "object-center"}`}
                     />
                   </motion.div>
                 </AnimatePresence>
@@ -230,13 +184,12 @@ export default function Challenges() {
                     key={index}
                     className="bg-white rounded-3xl p-6 flex flex-col justify-between border border-white h-auto lg:h-[321px]"
                     style={{ backgroundColor: `rgba(255,255,255,${card.opacity})` }}
-
                   >
                     <p className="text-base text-[#423f3d]">{card.number}</p>
                     <div className="relative flex-1 flex flex-col">
                       {/* Spacer to push content to bottom */}
                       <div className="flex-1 invisible pointer-events-none"></div>
-                      
+
                       {/* Invisible placeholder - maintains layout with consistent size */}
                       <div className="invisible pointer-events-none">
                         <p className="text-xl font-semibold text-[#130f0c] whitespace-pre-wrap">{placeholderTexts[index]}</p>
